@@ -5,7 +5,7 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 // Dependencies
 import utils from './utils';
@@ -14,16 +14,12 @@ const videoStream = {
     loadedData: false,
     defaultVideoDimensions: {
         width: 640,
-        height: 480
+        height: 480,
     },
     findVideoSize: function findVideoSizeMethod(obj) {
         findVideoSizeMethod.attempts = findVideoSizeMethod.attempts || 0;
 
-        const {
-            cameraStream,
-            completedCallback,
-            videoElement
-        } = obj;
+        const { cameraStream, completedCallback, videoElement } = obj;
 
         if (!videoElement) {
             return;
@@ -36,13 +32,13 @@ const videoStream = {
                 videoElement: videoElement,
                 cameraStream: cameraStream,
                 videoWidth: videoElement.videoWidth,
-                videoHeight: videoElement.videoHeight
+                videoHeight: videoElement.videoHeight,
             });
         } else {
             if (findVideoSizeMethod.attempts < 10) {
                 findVideoSizeMethod.attempts += 1;
 
-                utils.requestTimeout(function() {
+                utils.requestTimeout(function () {
                     videoStream.findVideoSize(obj);
                 }, 400);
             } else {
@@ -50,7 +46,7 @@ const videoStream = {
                     videoElement: videoElement,
                     cameraStream: cameraStream,
                     videoWidth: videoStream.defaultVideoDimensions.width,
-                    videoHeight: videoStream.defaultVideoDimensions.height
+                    videoHeight: videoStream.defaultVideoDimensions.height,
                 });
             }
         }
@@ -62,18 +58,13 @@ const videoStream = {
                 errorCode: 'getUserMedia',
                 errorMsg: 'There was an issue with the getUserMedia API - Timed out while trying to start streaming',
                 image: null,
-                cameraStream: {}
+                cameraStream: {},
             });
         }
     },
     stream: (obj) => {
         const existingVideo = utils.isArray(obj.existingVideo) ? obj.existingVideo[0] : obj.existingVideo;
-        const {
-            cameraStream,
-            completedCallback,
-            streamedCallback,
-            videoElement
-        } = obj;
+        const { cameraStream, completedCallback, streamedCallback, videoElement } = obj;
 
         if (utils.isFunction(streamedCallback)) {
             streamedCallback();
@@ -82,15 +73,12 @@ const videoStream = {
         if (existingVideo) {
             if (utils.isString(existingVideo)) {
                 videoElement.src = existingVideo;
-                videoElement.innerHTML = (
-                    '<source src="' + existingVideo + '" type="video/' + utils.getExtension(existingVideo) + '" />'
-                );
+                videoElement.innerHTML =
+                    '<source src="' + existingVideo + '" type="video/' + utils.getExtension(existingVideo) + '" />';
             } else if (existingVideo instanceof Blob) {
                 try {
                     videoElement.src = utils.URL.createObjectURL(existingVideo);
-                } catch (e) {
-
-                }
+                } catch (e) {}
 
                 videoElement.innerHTML = '<source src="' + existingVideo + '" type="' + existingVideo.type + '" />';
             }
@@ -107,14 +95,14 @@ const videoStream = {
 
         videoElement.play();
 
-        utils.requestTimeout(function checkLoadedData () {
+        utils.requestTimeout(function checkLoadedData() {
             checkLoadedData.count = checkLoadedData.count || 0;
 
             if (videoStream.loadedData === true) {
                 videoStream.findVideoSize({
                     videoElement,
                     cameraStream,
-                    completedCallback
+                    completedCallback,
                 });
 
                 videoStream.loadedData = false;
@@ -125,7 +113,7 @@ const videoStream = {
                     videoStream.findVideoSize({
                         videoElement,
                         cameraStream,
-                        completedCallback
+                        completedCallback,
                     });
                 } else {
                     checkLoadedData();
@@ -137,14 +125,12 @@ const videoStream = {
         const errorCallback = utils.isFunction(obj.error) ? obj.error : utils.noop;
         const streamedCallback = utils.isFunction(obj.streamed) ? obj.streamed : utils.noop;
         const completedCallback = utils.isFunction(obj.completed) ? obj.completed : utils.noop;
-        const {
-            crossOrigin,
-            existingVideo,
-            lastCameraStream,
-            options,
-            webcamVideoElement
-        } = obj;
-        const videoElement = utils.isElement(existingVideo) ? existingVideo : webcamVideoElement ? webcamVideoElement : document.createElement('video');
+        const { crossOrigin, existingVideo, lastCameraStream, options, webcamVideoElement } = obj;
+        const videoElement = utils.isElement(existingVideo)
+            ? existingVideo
+            : webcamVideoElement
+            ? webcamVideoElement
+            : document.createElement('video');
         let cameraStream;
 
         if (crossOrigin) {
@@ -157,7 +143,7 @@ const videoStream = {
         videoElement.addEventListener('loadeddata', (event) => {
             videoStream.loadedData = true;
             if (options.offset) {
-              videoElement.currentTime = options.offset;
+                videoElement.currentTime = options.offset;
             }
         });
 
@@ -165,90 +151,85 @@ const videoStream = {
             videoStream.stream({
                 videoElement,
                 existingVideo,
-                completedCallback
+                completedCallback,
             });
         } else if (lastCameraStream) {
             videoStream.stream({
                 videoElement,
                 cameraStream: lastCameraStream,
                 streamedCallback,
-                completedCallback
+                completedCallback,
             });
         } else {
-            utils.getUserMedia({
-                video: true
-            }, function(stream) {
-                videoStream.stream({
-                    videoElement: videoElement,
-                    cameraStream: stream,
-                    streamedCallback: streamedCallback,
-                    completedCallback: completedCallback
-                });
-            }, errorCallback);
+            utils.getUserMedia(
+                {
+                    video: true,
+                },
+                function (stream) {
+                    videoStream.stream({
+                        videoElement: videoElement,
+                        cameraStream: stream,
+                        streamedCallback: streamedCallback,
+                        completedCallback: completedCallback,
+                    });
+                },
+                errorCallback
+            );
         }
     },
     startVideoStreaming: (callback, options = {}) => {
-      const timeoutLength = options.timeout !== undefined ? options.timeout : 0;
-      const originalCallback = options.callback;
-      const webcamVideoElement = options.webcamVideoElement;
-      let noGetUserMediaSupportTimeout;
+        const timeoutLength = options.timeout !== undefined ? options.timeout : 0;
+        const originalCallback = options.callback;
+        const webcamVideoElement = options.webcamVideoElement;
+        let noGetUserMediaSupportTimeout;
 
-      // Some browsers apparently have support for video streaming because of the
-      // presence of the getUserMedia function, but then do not answer our
-      // calls for streaming.
-      // So we'll set up this timeout and if nothing happens after a while, we'll
-      // conclude that there's no actual getUserMedia support.
-      if (timeoutLength > 0) {
-          noGetUserMediaSupportTimeout = utils.requestTimeout(() => {
-              videoStream.onStreamingTimeout(originalCallback);
-          }, 10000);
-      }
+        // Some browsers apparently have support for video streaming because of the
+        // presence of the getUserMedia function, but then do not answer our
+        // calls for streaming.
+        // So we'll set up this timeout and if nothing happens after a while, we'll
+        // conclude that there's no actual getUserMedia support.
+        if (timeoutLength > 0) {
+            noGetUserMediaSupportTimeout = utils.requestTimeout(() => {
+                videoStream.onStreamingTimeout(originalCallback);
+            }, 10000);
+        }
 
-      videoStream.startStreaming({
-          error: () => {
-              originalCallback({
-                  error: true,
-                  errorCode: 'getUserMedia',
-                  errorMsg: 'There was an issue with the getUserMedia API - the user probably denied permission',
-                  image: null,
-                  cameraStream: {}
-              });
-          },
-          streamed: () => {
-              // The streaming started somehow, so we can assume there is getUserMedia support
-              clearTimeout(noGetUserMediaSupportTimeout);
-          },
-          completed: (obj = {}) => {
-              const {
-                  cameraStream,
-                  videoElement,
-                  videoHeight,
-                  videoWidth
-              } = obj;
+        videoStream.startStreaming({
+            error: () => {
+                originalCallback({
+                    error: true,
+                    errorCode: 'getUserMedia',
+                    errorMsg: 'There was an issue with the getUserMedia API - the user probably denied permission',
+                    image: null,
+                    cameraStream: {},
+                });
+            },
+            streamed: () => {
+                // The streaming started somehow, so we can assume there is getUserMedia support
+                clearTimeout(noGetUserMediaSupportTimeout);
+            },
+            completed: (obj = {}) => {
+                const { cameraStream, videoElement, videoHeight, videoWidth } = obj;
 
-              callback({
-                  cameraStream,
-                  videoElement,
-                  videoHeight,
-                  videoWidth
-              });
-          },
-          lastCameraStream: options.lastCameraStream,
-          webcamVideoElement: webcamVideoElement,
-          crossOrigin: options.crossOrigin,
-          options: options
-      });
+                callback({
+                    cameraStream,
+                    videoElement,
+                    videoHeight,
+                    videoWidth,
+                });
+            },
+            lastCameraStream: options.lastCameraStream,
+            webcamVideoElement: webcamVideoElement,
+            crossOrigin: options.crossOrigin,
+            options: options,
+        });
     },
     stopVideoStreaming: (obj) => {
         obj = utils.isObject(obj) ? obj : {};
 
-        const {
-            keepCameraOn,
-            videoElement,
-            webcamVideoElement
-        } = obj;
+        const { keepCameraOn, videoElement, webcamVideoElement } = obj;
         const cameraStream = obj.cameraStream || {};
-        const cameraStreamTracks = cameraStream.getTracks ? cameraStream.getTracks() || []: [];
+        const cameraStreamTracks = cameraStream.getTracks ? cameraStream.getTracks() || [] : [];
         const hasCameraStreamTracks = !!cameraStreamTracks.length;
         const firstCameraStreamTrack = cameraStreamTracks[0];
 
@@ -273,7 +254,7 @@ const videoStream = {
             // Removes the video element from the DOM
             utils.removeElement(videoElement);
         }
-    }
+    },
 };
 
 export default videoStream;

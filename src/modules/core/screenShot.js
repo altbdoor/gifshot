@@ -5,7 +5,7 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 // Dependencies
 import utils from './utils';
@@ -21,7 +21,7 @@ const screenShot = {
         let canvas = document.createElement('canvas');
         let context;
         let existingImages = options.images;
-        const hasExistingImages = !!(existingImages.length);
+        const hasExistingImages = !!existingImages.length;
         const {
             cameraStream,
             crop,
@@ -45,7 +45,7 @@ const screenShot = {
             waterMarkHeight,
             waterMarkWidth,
             waterMarkXCoordinate,
-            waterMarkYCoordinate
+            waterMarkYCoordinate,
         } = options;
         let gifWidth = Number(options.gifWidth);
         let gifHeight = Number(options.gifHeight);
@@ -57,14 +57,26 @@ const screenShot = {
         let pendingFrames = numFrames;
         let ag = new AnimatedGIF(options);
         let fontSize = utils.getFontSize(options);
-        let textXCoordinate = options.textXCoordinate ? options.textXCoordinate : textAlign === 'left' ? 1 : textAlign === 'right' ? gifWidth : gifWidth / 2;
-        let textYCoordinate = options.textYCoordinate ? options.textYCoordinate : textBaseline === 'top' ? 1 : textBaseline === 'center' ? gifHeight / 2 : gifHeight;
+        let textXCoordinate = options.textXCoordinate
+            ? options.textXCoordinate
+            : textAlign === 'left'
+            ? 1
+            : textAlign === 'right'
+            ? gifWidth
+            : gifWidth / 2;
+        let textYCoordinate = options.textYCoordinate
+            ? options.textYCoordinate
+            : textBaseline === 'top'
+            ? 1
+            : textBaseline === 'center'
+            ? gifHeight / 2
+            : gifHeight;
         let font = fontWeight + ' ' + fontSize + ' ' + fontFamily;
         let sourceX = crop ? Math.floor(crop.scaledWidth / 2) : 0;
         let sourceWidth = crop ? videoWidth - crop.scaledWidth : 0;
         let sourceY = crop ? Math.floor(crop.scaledHeight / 2) : 0;
         let sourceHeight = crop ? videoHeight - crop.scaledHeight : 0;
-        const captureFrames = function captureSingleFrame () {
+        const captureFrames = function captureSingleFrame() {
             const framesLeft = pendingFrames - 1;
 
             if (savedRenderingContexts.length) {
@@ -75,7 +87,7 @@ const screenShot = {
                 drawVideo();
             }
 
-            function drawVideo () {
+            function drawVideo() {
                 try {
                     // Makes sure the canvas video heights/widths are in bounds
                     if (sourceWidth > videoWidth) {
@@ -96,7 +108,17 @@ const screenShot = {
 
                     context.filter = filter;
 
-                    context.drawImage(videoElement, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, gifWidth, gifHeight);
+                    context.drawImage(
+                        videoElement,
+                        sourceX,
+                        sourceY,
+                        sourceWidth,
+                        sourceHeight,
+                        0,
+                        0,
+                        gifWidth,
+                        gifHeight
+                    );
 
                     finishCapture();
                 } catch (e) {
@@ -111,72 +133,78 @@ const screenShot = {
                 }
             }
 
-          function finishCapture () {
-              let imageData;
+            function finishCapture() {
+                let imageData;
 
-              if (saveRenderingContexts) {
-                  renderingContextsToSave.push(context.getImageData(0, 0, gifWidth, gifHeight));
-              }
-              if (waterMark) {
-                  context.drawImage(waterMark, waterMarkXCoordinate, waterMarkYCoordinate, waterMarkWidth, waterMarkHeight);
-              }
-              // If there is text to display, make sure to display it on the canvas after the image is drawn
-              if (text) {
-                  context.font = font;
-                  context.fillStyle = fontColor;
-                  context.textAlign = textAlign;
-                  context.textBaseline = textBaseline;
-                  context.fillText(text, textXCoordinate, textYCoordinate);
-              }
+                if (saveRenderingContexts) {
+                    renderingContextsToSave.push(context.getImageData(0, 0, gifWidth, gifHeight));
+                }
+                if (waterMark) {
+                    context.drawImage(
+                        waterMark,
+                        waterMarkXCoordinate,
+                        waterMarkYCoordinate,
+                        waterMarkWidth,
+                        waterMarkHeight
+                    );
+                }
+                // If there is text to display, make sure to display it on the canvas after the image is drawn
+                if (text) {
+                    context.font = font;
+                    context.fillStyle = fontColor;
+                    context.textAlign = textAlign;
+                    context.textBaseline = textBaseline;
+                    context.fillText(text, textXCoordinate, textYCoordinate);
+                }
 
-              imageData = context.getImageData(0, 0, gifWidth, gifHeight);
+                imageData = context.getImageData(0, 0, gifWidth, gifHeight);
 
-              ag.addFrameImageData(imageData);
+                ag.addFrameImageData(imageData);
 
-              pendingFrames = framesLeft;
+                pendingFrames = framesLeft;
 
-              // Call back with an r value indicating how far along we are in capture
-              progressCallback((numFrames - pendingFrames) / numFrames);
+                // Call back with an r value indicating how far along we are in capture
+                progressCallback((numFrames - pendingFrames) / numFrames);
 
-              if (framesLeft > 0) {
-                // test
-                  utils.requestTimeout(captureSingleFrame, waitBetweenFrames);
-              }
+                if (framesLeft > 0) {
+                    // test
+                    utils.requestTimeout(captureSingleFrame, waitBetweenFrames);
+                }
 
-              if (!pendingFrames) {
-                  ag.getBase64GIF((image) => {
-                      callback({
-                        'error': false,
-                        'errorCode': '',
-                        'errorMsg': '',
-                        'image': image,
-                        'cameraStream': cameraStream,
-                        'videoElement': videoElement,
-                        'webcamVideoElement': webcamVideoElement,
-                        'savedRenderingContexts': renderingContextsToSave,
-                        'keepCameraOn': keepCameraOn
-                      });
-                  });
-              }
-          }
-      };
+                if (!pendingFrames) {
+                    ag.getBase64GIF((image) => {
+                        callback({
+                            error: false,
+                            errorCode: '',
+                            errorMsg: '',
+                            image: image,
+                            cameraStream: cameraStream,
+                            videoElement: videoElement,
+                            webcamVideoElement: webcamVideoElement,
+                            savedRenderingContexts: renderingContextsToSave,
+                            keepCameraOn: keepCameraOn,
+                        });
+                    });
+                }
+            }
+        };
 
-      numFrames = numFrames !== undefined ? numFrames : 10;
-      interval = interval !== undefined ? interval : 0.1; // In seconds
+        numFrames = numFrames !== undefined ? numFrames : 10;
+        interval = interval !== undefined ? interval : 0.1; // In seconds
 
-      canvas.width = gifWidth;
-      canvas.height = gifHeight;
-      context = canvas.getContext('2d');
+        canvas.width = gifWidth;
+        canvas.height = gifHeight;
+        context = canvas.getContext('2d');
 
-      (function capture() {
-          if (!savedRenderingContexts.length && videoElement.currentTime === 0) {
-              utils.requestTimeout(capture, 100);
+        (function capture() {
+            if (!savedRenderingContexts.length && videoElement.currentTime === 0) {
+                utils.requestTimeout(capture, 100);
 
-              return;
-          }
+                return;
+            }
 
-          captureFrames();
-      }());
+            captureFrames();
+        })();
     },
     getCropDimensions: (obj = {}) => {
         const width = obj.videoWidth;
@@ -187,7 +215,7 @@ const screenShot = {
             width: 0,
             height: 0,
             scaledWidth: 0,
-            scaledHeight: 0
+            scaledHeight: 0,
         };
 
         if (width > height) {
@@ -199,7 +227,7 @@ const screenShot = {
         }
 
         return result;
-    }
+    },
 };
 
 export default screenShot;

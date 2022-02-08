@@ -5,24 +5,20 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 import utils from './utils';
 import AnimatedGIF from './AnimatedGIF';
 import getBase64GIF from './getBase64GIF';
 import error from './error';
 
-export default function existingImages (obj = {}) {
+export default function existingImages(obj = {}) {
     const self = this;
-    const {
-        callback,
-        images,
-        options
-    } = obj;
+    const { callback, images, options } = obj;
     let imagesLength = obj.imagesLength;
     const skipObj = {
-        'getUserMedia': true,
-        'window.URL': true
+        getUserMedia: true,
+        'window.URL': true,
     };
     const errorObj = error.validate(skipObj);
     let loadedImages = [];
@@ -62,7 +58,7 @@ export default function existingImages (obj = {}) {
             }
 
             (function (tempImage) {
-                if(image.text) {
+                if (image.text) {
                     tempImage.text = image.text;
                 }
 
@@ -80,10 +76,10 @@ export default function existingImages (obj = {}) {
                 };
 
                 tempImage.onload = function (e) {
-                    if(image.text) {
+                    if (image.text) {
                         loadedImages[index] = {
-                            img:tempImage,
-                            text: tempImage.text
+                            img: tempImage,
+                            text: tempImage.text,
                         };
                     } else {
                         loadedImages[index] = tempImage;
@@ -99,21 +95,21 @@ export default function existingImages (obj = {}) {
                 };
 
                 tempImage.src = currentImage;
-            }(tempImage));
+            })(tempImage);
 
             utils.setCSSAttr(tempImage, {
                 position: 'fixed',
-                opacity: '0'
+                opacity: '0',
             });
 
             document.body.appendChild(tempImage);
         }
     });
 
-    function addLoadedImagesToGif () {
+    function addLoadedImagesToGif() {
         utils.each(loadedImages, function (index, loadedImage) {
             if (loadedImage) {
-                if(loadedImage.text) {
+                if (loadedImage.text) {
                     ag.addFrame(loadedImage.img, options, loadedImage.text);
                 } else {
                     ag.addFrame(loadedImage, options);
@@ -123,4 +119,4 @@ export default function existingImages (obj = {}) {
 
         getBase64GIF(ag, callback);
     }
-};
+}

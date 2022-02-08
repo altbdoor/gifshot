@@ -5,7 +5,7 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 // Dependencies
 import utils from './utils';
@@ -13,15 +13,11 @@ import createAndGetGIF from './createAndGetGIF';
 import videoStream from './videoStream';
 import error from './error';
 
-export default function existingVideo (obj = {}) {
-    let {
-        callback,
-        existingVideo,
-        options
-    } = obj;
+export default function existingVideo(obj = {}) {
+    let { callback, existingVideo, options } = obj;
     const skipObj = {
         getUserMedia: true,
-        'window.URL': true
+        'window.URL': true,
     };
     const errorObj = error.validate(skipObj);
     let loadedImages = 0;
@@ -42,7 +38,7 @@ export default function existingVideo (obj = {}) {
             return callback(error.messages.videoCodecs);
         }
     } else if (utils.isArray(existingVideo)) {
-        utils.each(existingVideo, function(iterator, videoSrc) {
+        utils.each(existingVideo, function (iterator, videoSrc) {
             if (videoSrc instanceof Blob) {
                 videoType = videoSrc.type.substr(videoSrc.type.lastIndexOf('/') + 1, videoSrc.length);
             } else {
@@ -65,6 +61,6 @@ export default function existingVideo (obj = {}) {
         },
         existingVideo: existingVideo,
         crossOrigin: options.crossOrigin,
-        options: options
+        options: options,
     });
-};
+}

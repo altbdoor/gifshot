@@ -5,11 +5,11 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 import NeuQuant from '../dependencies/NeuQuant';
 
-export default function workerCode () {
+export default function workerCode() {
     const self = this;
 
     try {
@@ -17,12 +17,12 @@ export default function workerCode () {
             var data = ev.data || {};
             var response;
 
-            if (data.gifshot){
+            if (data.gifshot) {
                 response = workerMethods.run(data);
                 postMessage(response);
             }
         };
-    } catch (e) {};
+    } catch (e) {}
 
     const workerMethods = {
         dataToRGB: function (data, width, height) {
@@ -49,13 +49,13 @@ export default function workerCode () {
                 let g = paletteRGB[i + 1];
                 let b = paletteRGB[i + 2];
 
-                paletteArray.push(r << 16 | g << 8 | b);
+                paletteArray.push((r << 16) | (g << 8) | b);
             }
 
             return paletteArray;
         },
         // This is the "traditional" Animated_GIF style of going from RGBA to indexed color frames
-        'processFrameWithQuantizer': function (imageData, width, height, sampleInterval) {
+        processFrameWithQuantizer: function (imageData, width, height, sampleInterval) {
             let rgbComponents = this.dataToRGB(imageData, width, height);
             let nq = new NeuQuant(rgbComponents, rgbComponents.length, sampleInterval);
             let paletteRGB = nq.process();
@@ -74,23 +74,18 @@ export default function workerCode () {
 
             return {
                 pixels: indexedPixels,
-                palette: paletteArray
+                palette: paletteArray,
             };
         },
-        'run': function (frame) {
+        run: function (frame) {
             frame = frame || {};
 
-            let {
-                height,
-                palette,
-                sampleInterval,
-                width
-            } = frame;
+            let { height, palette, sampleInterval, width } = frame;
             const imageData = frame.data;
 
             return this.processFrameWithQuantizer(imageData, width, height, sampleInterval);
-        }
+        },
     };
 
     return workerMethods;
-};
+}

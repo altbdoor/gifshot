@@ -5,7 +5,7 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 // Helpers
 const noop = () => {};
@@ -45,7 +45,7 @@ const defaultOptions = {
     waterMarkHeight: null,
     waterMarkWidth: null,
     waterMarkXCoordinate: 1,
-    waterMarkYCoordinate: 1
+    waterMarkYCoordinate: 1,
 };
 
 export default defaultOptions;

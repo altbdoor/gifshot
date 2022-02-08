@@ -5,34 +5,25 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 const utils = {
-    URL: (
-        window.URL ||
-        window.webkitURL ||
-        window.mozURL ||
-        window.msURL
-    ),
+    URL: window.URL || window.webkitURL || window.mozURL || window.msURL,
     getUserMedia: (() => {
-        const getUserMedia = (
+        const getUserMedia =
             navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia
-        );
+            navigator.msGetUserMedia;
 
-        return (
-            getUserMedia ? getUserMedia.bind(navigator) : getUserMedia
-        );
+        return getUserMedia ? getUserMedia.bind(navigator) : getUserMedia;
     })(),
-    requestAnimFrame: (
+    requestAnimFrame:
         window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame
-    ),
+        window.msRequestAnimationFrame,
     requestTimeout: (callback, delay) => {
         callback = callback || utils.noop;
         delay = delay || 0;
@@ -49,108 +40,77 @@ const utils = {
             const current = new Date().getTime();
             const delta = current - start;
 
-            delta >= delay ? callback.call() : handle.value = requestAnimFrame(loop);
+            delta >= delay ? callback.call() : (handle.value = requestAnimFrame(loop));
         };
 
         handle.value = requestAnimFrame(loop);
 
         return handle;
     },
-    Blob: (
-        window.Blob ||
-        window.BlobBuilder ||
-        window.WebKitBlobBuilder ||
-        window.MozBlobBuilder ||
-        window.MSBlobBuilder
-    ),
+    Blob:
+        window.Blob || window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder,
     btoa: (() => {
-        let btoa = window.btoa || function (input) {
-            let output = '';
-            let i = 0;
-            let l = input.length;
-            let key = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-            let chr1;
-            let chr2;
-            let chr3;
-            let enc1;
-            let enc2;
-            let enc3;
-            let enc4;
+        let btoa =
+            window.btoa ||
+            function (input) {
+                let output = '';
+                let i = 0;
+                let l = input.length;
+                let key = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+                let chr1;
+                let chr2;
+                let chr3;
+                let enc1;
+                let enc2;
+                let enc3;
+                let enc4;
 
-            while (i < l) {
-                chr1 = input.charCodeAt(i++);
-                chr2 = input.charCodeAt(i++);
-                chr3 = input.charCodeAt(i++);
-                enc1 = chr1 >> 2;
-                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-                enc4 = chr3 & 63;
+                while (i < l) {
+                    chr1 = input.charCodeAt(i++);
+                    chr2 = input.charCodeAt(i++);
+                    chr3 = input.charCodeAt(i++);
+                    enc1 = chr1 >> 2;
+                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                    enc4 = chr3 & 63;
 
-                if (isNaN(chr2)) {
-                    enc3 = enc4 = 64;
-                } else if (isNaN(chr3)) {
-                    enc4 = 64;
+                    if (isNaN(chr2)) {
+                        enc3 = enc4 = 64;
+                    } else if (isNaN(chr3)) {
+                        enc4 = 64;
+                    }
+
+                    output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
                 }
 
-                output = (
-                    output +
-                    key.charAt(enc1) +
-                    key.charAt(enc2) +
-                    key.charAt(enc3) +
-                    key.charAt(enc4)
-                );
-            }
-
-            return output;
-        };
+                return output;
+            };
 
         return btoa ? btoa.bind(window) : utils.noop;
     })(),
     isObject: (obj) => {
-        return (
-            obj &&
-            Object.prototype.toString.call(obj) === '[object Object]'
-        );
+        return obj && Object.prototype.toString.call(obj) === '[object Object]';
     },
     isEmptyObject: (obj) => {
-        return (
-            utils.isObject(obj) &&
-            !Object.keys(obj).length
-        );
+        return utils.isObject(obj) && !Object.keys(obj).length;
     },
     isArray: (arr) => {
-        return (
-            arr &&
-            Array.isArray(arr)
-        );
+        return arr && Array.isArray(arr);
     },
     isFunction: (func) => {
-        return (
-            func &&
-            typeof func === 'function'
-        );
+        return func && typeof func === 'function';
     },
     isElement: (elem) => {
-        return (
-            elem &&
-            elem.nodeType === 1
-        );
+        return elem && elem.nodeType === 1;
     },
     isString: (value) => {
-        return (
-            typeof value === 'string' ||
-            Object.prototype.toString.call(value) === '[object String]'
-        );
+        return typeof value === 'string' || Object.prototype.toString.call(value) === '[object String]';
     },
     isSupported: {
         canvas: () => {
             var el = document.createElement('canvas');
 
-            return (
-                el &&
-                el.getContext &&
-                el.getContext('2d')
-            );
+            return el && el.getContext && el.getContext('2d');
         },
         webworkers: () => {
             return window.Worker;
@@ -167,35 +127,36 @@ const utils = {
         videoCodecs: (() => {
             const testEl = document.createElement('video');
             let supportObj = {
-                'mp4': false,
-                'h264': false,
-                'ogv': false,
-                'ogg': false,
-                'webm': false
+                mp4: false,
+                h264: false,
+                ogv: false,
+                ogg: false,
+                webm: false,
             };
 
             try {
                 if (testEl && testEl.canPlayType) {
-                  // Check for MPEG-4 support
-                  supportObj.mp4 = testEl.canPlayType('video/mp4; codecs="mp4v.20.8"') !== '';
+                    // Check for MPEG-4 support
+                    supportObj.mp4 = testEl.canPlayType('video/mp4; codecs="mp4v.20.8"') !== '';
 
-                  // Check for h264 support
-                  supportObj.h264 = (testEl.canPlayType('video/mp4; codecs="avc1.42E01E"') ||
-                    testEl.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')) !== '';
+                    // Check for h264 support
+                    supportObj.h264 =
+                        (testEl.canPlayType('video/mp4; codecs="avc1.42E01E"') ||
+                            testEl.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')) !== '';
 
-                  // Check for Ogv support
-                  supportObj.ogv = testEl.canPlayType('video/ogg; codecs="theora"') !== '';
+                    // Check for Ogv support
+                    supportObj.ogv = testEl.canPlayType('video/ogg; codecs="theora"') !== '';
 
-                  // Check for Ogg support
-                  supportObj.ogg = testEl.canPlayType('video/ogg; codecs="theora"') !== '';
+                    // Check for Ogg support
+                    supportObj.ogg = testEl.canPlayType('video/ogg; codecs="theora"') !== '';
 
-                  // Check for Webm support
-                  supportObj.webm = testEl.canPlayType('video/webm; codecs="vp8, vorbis"') !== -1;
+                    // Check for Webm support
+                    supportObj.webm = testEl.canPlayType('video/webm; codecs="vp8, vorbis"') !== -1;
                 }
             } catch (e) {}
 
             return supportObj;
-        })()
+        })(),
     },
     noop: () => {},
     each: (collection, callback) => {
@@ -223,7 +184,7 @@ const utils = {
     },
     mergeOptions: (defaultOptions, userOptions) => {
         if (!utils.isObject(defaultOptions) || !utils.isObject(userOptions) || !Object.keys) {
-          return;
+            return;
         }
 
         let newObj = {};
@@ -256,7 +217,7 @@ const utils = {
         if (utils.isString(attr) && utils.isString(val)) {
             elem.style[attr] = val;
         } else if (utils.isObject(attr)) {
-            utils.each(attr, function(key, val) {
+            utils.each(attr, function (key, val) {
                 elem.style[key] = val;
             });
         }
@@ -276,24 +237,24 @@ const utils = {
 
         try {
             const blob = new utils.Blob([content], {
-                'type': 'text/javascript'
+                type: 'text/javascript',
             });
             const objectUrl = utils.URL.createObjectURL(blob);
             const worker = new Worker(objectUrl);
 
             return {
-                'objectUrl': objectUrl,
-                'worker': worker
+                objectUrl: objectUrl,
+                worker: worker,
             };
         } catch (e) {
-          return '' + e;
+            return '' + e;
         }
     },
     getExtension: (src) => {
         return src.substr(src.lastIndexOf('.') + 1, src.length);
     },
     getFontSize: (options = {}) => {
-        if (!document.body || (options.resizeFont === false)) {
+        if (!document.body || options.resizeFont === false) {
             return options.fontSize;
         }
 
@@ -322,7 +283,7 @@ const utils = {
 
         return fontSize + 'px';
     },
-    webWorkerError: false
+    webWorkerError: false,
 };
 
 export default utils;

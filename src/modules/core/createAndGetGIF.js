@@ -5,34 +5,26 @@
 
 /* Copyright  2017 Yahoo Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
-*/
+ */
 
 // Dependencies
 import utils from './utils';
 import screenShot from './screenShot';
 import stopVideoStreaming from '../API/stopVideoStreaming';
 
-export default function createAndGetGIF (obj, callback) {
+export default function createAndGetGIF(obj, callback) {
     let options = obj.options || {};
 
-    const {
-        images,
-        video
-    } = options;
+    const { images, video } = options;
     const gifWidth = Number(options.gifWidth);
     const gifHeight = Number(options.gifHeight);
     const numFrames = Number(options.numFrames);
-    let {
-        cameraStream,
-        videoElement,
-        videoWidth,
-        videoHeight
-    } = obj;
+    let { cameraStream, videoElement, videoWidth, videoHeight } = obj;
     const cropDimensions = screenShot.getCropDimensions({
         videoWidth,
         videoHeight,
         gifHeight,
-        gifWidth
+        gifWidth,
     });
     const completeCallback = callback;
 
@@ -52,7 +44,7 @@ export default function createAndGetGIF (obj, callback) {
     if (!options.webcamVideoElement) {
         utils.setCSSAttr(videoElement, {
             position: 'fixed',
-            opacity: '0'
+            opacity: '0',
         });
 
         document.body.appendChild(videoElement);
@@ -69,4 +61,4 @@ export default function createAndGetGIF (obj, callback) {
 
         completeCallback(obj);
     });
-};
+}
