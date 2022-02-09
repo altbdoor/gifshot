@@ -10,8 +10,8 @@
 // Dependencies
 import utils from './utils';
 import frameWorkerCode from './processFrameWorker';
-import NeuQuant from '../dependencies/NeuQuant';
-import GifWriter from '../dependencies/gifWriter';
+import NeuQuant from 'animated_gif/src/lib/NeuQuant';
+import { GifWriter } from 'omggif/omggif';
 
 // Helpers
 const noop = () => {};

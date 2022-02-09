@@ -12,6 +12,8 @@ const insert = require('gulp-insert');
 const rename = require('gulp-rename');
 const mocha = require('gulp-mocha');
 const fs = require('fs');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
 
 // Helpers
 const licenseText = '/*' + fs.readFileSync('./LICENSE.txt', 'utf8') + '\n*/\n';
@@ -35,6 +37,8 @@ gulp.task('build', function (cb) {
                         ],
                     ],
                 }),
+                nodeResolve(),
+                commonjs(),
             ],
         })
         .then(function (bundle) {

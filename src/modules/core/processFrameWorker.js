@@ -7,7 +7,7 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 
-import NeuQuant from '../dependencies/NeuQuant';
+import NeuQuant from 'animated_gif/src/lib/NeuQuant';
 
 export default function workerCode() {
     const self = this;
