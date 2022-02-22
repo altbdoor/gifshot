@@ -28,6 +28,7 @@ const AnimatedGIF = function (options) {
     this.availableWorkers = [];
     this.generatingGIF = false;
     this.options = options;
+    this.cachedBlobUrl = null;
 
     // Constructs and initializes the the web workers appropriately
     this.initializeWebWorkers(options);
@@ -220,10 +221,12 @@ AnimatedGIF.prototype = {
         const gifWriter = new GifWriter(buffer, width, height, gifOptions);
         const onRenderProgressCallback = this.onRenderProgressCallback;
         const delay = hasExistingImages ? interval * 100 : 0;
-        let bufferToString;
-        let gif;
 
         this.generatingGIF = true;
+
+        if (this.cachedBlobUrl) {
+            utils.URL.revokeObjectURL(this.cachedBlobUrl);
+        }
 
         utils.each(frames, (iterator, frame) => {
             const framePalette = frame.palette;
@@ -247,10 +250,10 @@ AnimatedGIF.prototype = {
         this.generatingGIF = false;
 
         if (utils.isFunction(callback)) {
-            bufferToString = this.bufferToString(buffer);
-            gif = 'data:image/gif;base64,' + utils.btoa(bufferToString);
+            const gifBlob = new utils.Blob([new Uint8Array(buffer)], { type: 'image/gif' });
+            this.cachedBlobUrl = utils.URL.createObjectURL(gifBlob);
 
-            callback(gif);
+            callback(this.cachedBlobUrl);
         }
     },
     // From GIF: 0 = loop forever, null = not looping, n > 0 = loop n times and stop

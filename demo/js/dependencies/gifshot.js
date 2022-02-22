@@ -1939,7 +1939,8 @@ var AnimatedGIF = function AnimatedGIF(options) {
   this.workers = [];
   this.availableWorkers = [];
   this.generatingGIF = false;
-  this.options = options; // Constructs and initializes the the web workers appropriately
+  this.options = options;
+  this.cachedBlobUrl = null; // Constructs and initializes the the web workers appropriately
 
   this.initializeWebWorkers(options);
 };
@@ -2126,9 +2127,12 @@ AnimatedGIF.prototype = {
     var gifWriter = new GifWriter_1(buffer, width, height, gifOptions);
     var onRenderProgressCallback = this.onRenderProgressCallback;
     var delay = hasExistingImages ? interval * 100 : 0;
-    var bufferToString;
-    var gif;
     this.generatingGIF = true;
+
+    if (this.cachedBlobUrl) {
+      utils.URL.revokeObjectURL(this.cachedBlobUrl);
+    }
+
     utils.each(frames, function (iterator, frame) {
       var framePalette = frame.palette;
       onRenderProgressCallback(0.75 + 0.25 * frame.position * 1.0 / frames.length);
@@ -2146,9 +2150,11 @@ AnimatedGIF.prototype = {
     this.generatingGIF = false;
 
     if (utils.isFunction(callback)) {
-      bufferToString = this.bufferToString(buffer);
-      gif = 'data:image/gif;base64,' + utils.btoa(bufferToString);
-      callback(gif);
+      var gifBlob = new utils.Blob([new Uint8Array(buffer)], {
+        type: 'image/gif'
+      });
+      this.cachedBlobUrl = utils.URL.createObjectURL(gifBlob);
+      callback(this.cachedBlobUrl);
     }
   },
   // From GIF: 0 = loop forever, null = not looping, n > 0 = loop n times and stop
